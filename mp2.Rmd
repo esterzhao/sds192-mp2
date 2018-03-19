@@ -5,10 +5,17 @@ date: "October 31, 2017"
 output: html_document
 ---
 
+Instructions:
+1. discuss an interesting and well-motivated topic
+2. involve some non-trivial data wrangling (e.g. not just a bunch of mutate()s)
+3. provide a well thought-out, informative analysis
+4. convey some sort of insight
+5. be well-written
+
 
 ## Loading the data
 
-This project is so interesting and relevant to my life!
+
 
 ```{r, include=FALSE}
 load("house_elections.rda")
