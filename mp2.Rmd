@@ -36,9 +36,9 @@ cand_info <- candidates %>%
 
 
 cand_contributions <- contributions %>%
-  select(name, cand_id, transaction_amt)
-
-cand_contributions <- na.omit(cand_contributions)
+  select(name, cand_id, transaction_amt) %>%
+  filter(cand_id != "") %>%
+  arrange(cand_id)
 
 total_cand_cantrib <- cand_contributions 
   
@@ -54,6 +54,8 @@ Plans:
 Steps:
     1. Find a way to eliminate NA data from dataset DONE
     2. Create a new data set that contains total contributions for each candidate
+        - Create a list of all cand_id
+        - Create a function that runs through the list of names & checks in cand_contributions to consolidate cand total contributions
     3. Merge total_contributions with cand_info using a join() function
     4. Create a cool data graphic!!
     5. Get an A!!!
