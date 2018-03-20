@@ -5,6 +5,12 @@ date: "October 31, 2017"
 output: html_document
 ---
 
+```{r}
+library(tidyverse)
+library(dplyr)
+
+```
+
 Instructions:
 1. discuss an interesting and well-motivated topic
 2. involve some non-trivial data wrangling (e.g. not just a bunch of mutate()s)
@@ -21,3 +27,33 @@ load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
 ```
+
+```{r}
+cand_info <- candidates %>%
+  select(cand_id, cand_name, cand_party_affiliation, cand_office_state, cand_election_yr) %>%
+  filter(cand_office_state == "US") %>%
+  arrange(cand_election_yr)
+
+
+cand_contributions <- contributions %>%
+  select(name, cand_id, transaction_amt)
+
+cand_contributions <- na.omit(cand_contributions)
+
+total_cand_cantrib <- cand_contributions 
+  
+  
+```
+
+
+Plans:
+    1. Average total contributions by political party (presidential election)
+        - bar graph (area for contribution)
+    2. Contribution amount and election results (scatterplot/line graph)
+
+Steps:
+    1. Find a way to eliminate NA data from dataset DONE
+    2. Create a new data set that contains total contributions for each candidate
+    3. Merge total_contributions with cand_info using a join() function
+    4. Create a cool data graphic!!
+    5. Get an A!!!
