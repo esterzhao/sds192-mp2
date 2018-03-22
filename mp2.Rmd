@@ -8,6 +8,7 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(gridExtra)
 
 ```
 
@@ -30,20 +31,89 @@ load("contributions.rda")
 
 ```{r}
 cand_info <- candidates %>%
-  select(cand_id, cand_name, cand_party_affiliation, cand_office_state, cand_election_yr) %>%
-  filter(cand_office_state == "US") %>%
-  arrange(cand_election_yr)
-
+  select(cand_id, cand_party_affiliation, cand_office, cand_election_yr) %>%
+  filter( cand_office == "S"| cand_office == "H",
+         cand_election_yr >= 2008 &
+           cand_election_yr <= 2016) %>%
+  arrange(cand_election_yr) %>%
+  arrange(cand_office)
 
 cand_contributions <- contributions %>%
   select(name, cand_id, transaction_amt) %>%
   filter(cand_id != "") %>%
   arrange(cand_id)
 
-total_cand_cantrib <- cand_contributions 
-  
+total_cand_contrib <- cand_contributions %>%
+  group_by(cand_id) %>%
+  summarise(total = sum(transaction_amt), n = n()) 
+
+join_tbl <- total_cand_contrib %>%
+  left_join(cand_info, cand_contributions, by = NULL, copy = FALSE, suffix = c(".cand_info", ".cand_con")) %>%
+  filter(!is.na(cand_election_yr), 
+         cand_party_affiliation != "" ) %>%
+  arrange(cand_election_yr)
+
+final_tbl <- join_tbl %>%
+  filter(cand_party_affiliation == "DEM" | cand_party_affiliation == "REP") %>%
+  filter(cand_election_yr != 2009 & cand_election_yr != 2011) %>%
+  group_by(cand_election_yr, cand_party_affiliation, cand_office ) %>%
+  summarise(total_contrib = sum(total), n = n())
   
 ```
+
+```{r}
+ggplot(final_tbl, aes(x = cand_election_yr, 
+                      y = total_contrib)) +
+  geom_line() +
+  geom_point(aes(color = cand_party_affiliation)) 
+  
+```
+
+```{r}
+l_years = c(2008, 2010, 2012, 2014, 2016)
+```
+
+```{r}
+yearly_contrib <- function(year_arg) {
+  cand_info <- candidates %>%
+  select(cand_id, cand_party_affiliation, cand_office, cand_election_yr) %>%
+  filter( cand_office == "S"| cand_office == "H") %>%
+  filter( cand_election_yr == year_arg) %>%
+  arrange(cand_election_yr) %>%
+  arrange(cand_office)
+
+  cand_contributions <- contributions %>%
+    select(name, cand_id, transaction_amt) %>%
+    filter(cand_id != "") %>%
+    arrange(cand_id)
+  
+  total_cand_contrib <- cand_contributions %>%
+    group_by(cand_id) %>%
+    summarise(total = sum(transaction_amt), n = n()) 
+  
+  join_tbl <- total_cand_contrib %>%
+    left_join(cand_info, cand_contributions, by = NULL, copy = FALSE, suffix = c(".cand_info", ".cand_con")) %>%
+    filter(!is.na(cand_election_yr), 
+           cand_party_affiliation != "" ) %>%
+    arrange(cand_election_yr)
+  
+  final_tbl <- join_tbl %>%
+    filter(cand_party_affiliation == "DEM" | cand_party_affiliation == "REP") %>%
+    filter( cand_election_yr == year_arg) %>%
+    group_by(cand_election_yr, cand_party_affiliation, cand_office) %>%
+    summarise(total_contrib = sum(total), n = n())
+  
+  ggplot(final_tbl, aes(x = cand_party_affiliation, 
+                        y = total_contrib)) +
+    geom_bar(stat = "identity", 
+             aes(fill = cand_office)) +
+    ggtitle(year_arg)
+}
+plots <- lapply(l_years, FUN = yearly_contrib)
+do.call("grid.arrange", c(plots, ncol = 2))
+```
+
+
 
 
 Plans:
@@ -54,8 +124,12 @@ Plans:
 Steps:
     1. Find a way to eliminate NA data from dataset DONE
     2. Create a new data set that contains total contributions for each candidate
-        - Create a list of all cand_id
+        - Create a list of all cand_id DONE
         - Create a function that runs through the list of names & checks in cand_contributions to consolidate cand total contributions
     3. Merge total_contributions with cand_info using a join() function
     4. Create a cool data graphic!!
     5. Get an A!!!
+
+EDIT NEW PLAN: 
+  1. Use scatterplot to map DEM vs REP to show total contributions during Obama's Presidency 
+  2. Joining contributions for candidates (D vs R)
