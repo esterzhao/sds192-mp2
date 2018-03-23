@@ -7,7 +7,7 @@ output:
     code_folding: hide
 ---
 
-We wanted to look at how parties total contributions changed over Obama’s presidency (2008 to 2016) to observe how a Democratic president affects the contributions made to both the Republican and Democratic parties from committees. Because Obama’s presidency was marked by an inability to pass bills due to a standstill in the Senate and House, we wanted to look into the House and Senate elections that occurred during Obama’s presidency. We hypothesized that the Republican party made a large amount of contributions in order to make a primarily Republican Senate in order to prevent the Democratic president from passing bills. To do this, we used the data sets ‘candidates’ and ‘contributions’ provided by the Federal Election Commission. 
+We wanted to look at how parties total contributions changed over Obama’s presidency (2008 to 2016) to observe how a Democratic president affects the contributions made to both the Republican and Democratic parties from committees. Because Obama’s presidency was marked by an inability to pass bills due to a standstill in the Senate and House, we wanted to look into the House and Senate elections that occurred during Obama’s presidency. We hypothesized that the Republican party made a large amount of contributions in order to make a primarily Republican Senate in order to prevent the Democratic president from passing bills. To do this, we used the data sets ‘candidates’ and ‘contributions’ provided by the [Federal Election Commission](https://classic.fec.gov/finance/disclosure/ftpdet.shtml#archive_link). 
 
 ```{r setup, include = FALSE}
 library(tidyverse)
@@ -65,12 +65,13 @@ ggplot(final_tbl, aes(x = cand_election_yr,
         y = "Total Contributions ($)") +
   ggtitle("Contributions by Party During Obama's Presidency") +
   geom_line(aes(color = cand_party_affiliation),
-            size = 1.2) +
+            size = 1.2,
+            alpha = 0.4) +
   geom_point(aes(color = cand_party_affiliation), 
              size = 2) +
   scale_colour_manual(name = "Party Affiliation", 
                     labels = c("Democrat", "Republican"),
-                    values = c("blue4", "red4"))
+                    values = c("blue4", "red4")) 
   
 ```
 
@@ -84,6 +85,7 @@ l_years = c(2008, 2010, 2012, 2014, 2016)
 ### Contrasting Contributions Per Year in Obama's Presidency
 ```{r, message = FALSE}
 yearly_contrib <- function(year_arg) {
+  #function takes a year argument to create data sets
   cand_info <- candidates %>%
   select(cand_id, cand_party_affiliation, cand_office, cand_election_yr) %>%
   filter( cand_office == "S"| cand_office == "H") %>%
@@ -131,11 +133,17 @@ plots <- lapply(l_years, FUN = yearly_contrib)
 do.call("grid.arrange", c(plots, ncol = 2))
 ```
 
-To make this collection of graphs, we created a function that will take a year argument, and create a graph that compares the contributions made by the Democratic party and the Republican party to House and Senate elections. This function can be used for any year, but in this case we entered the years of Obama’s presidency. To do this, we used the lapply() function to create a for-loop over a list of Obama’s presidency years.
+To make this collection of graphs, we created a function that will create a graph that compares the contributions made by the Democratic party and the Republican party to House and Senate elections. This function can be used for any year, but in this case we entered the years of Obama’s presidency. 
 
 These graphs show the total contributions made by the Republican and Democratic parties per year, for both Senate and House elections. This is to give a more detailed look into each year that is shown in the first graph above. These graphs show that a generalization about which party gave more contributions cannot be made, as this fluctuated greatly year by year. For the years 2014 and 2016, there was a lack of information within our datasets for Senate and House election contributions, hence the lack of data. 
 
 
 ### Conclusion: 
 
-Our findings do not support our hypothesis that the Republican party made a large amount of contributions in order to make a primarily Republican Senate and House to undermine any efforts made by a Democratic president. Instead, our graphs show that the contributions made to either parties fluctuated greatly by year. The year after Obama was sworn into office show significantly more contributions made to the House elections by the Republican party. During Obama’s reelection year, the graphs show an even distributions of contributions made to both parties, showing an equal interest and investment in putting candidates of each party in office. Finally, in 2016, while Secretary Hillary Clinton and Donald Trump were running against year other for the presidential election, a large amount of contributions were made by the Republican party in comparison to the Democratic party. From our data we can determine that the contributions made by each party fluctuates based on current events and changes year by year. We hope that our graphics and function can be used in the future to further analyze the flow of contributions in politics based on the current president. 
+Our graphs show that the contributions made to each parties fluctuated greatly by year. The year after Obama was sworn into office shows significantly more contributions made to the House elections by the Republican party. During Obama’s reelection year, the graphs show an even distributions of contributions made to both parties, indicating an equal interest and investment in putting candidates of each party in office. Finally, in 2016, while Secretary Hillary Clinton and Donald Trump were running against year other for the presidential election, a large amount of contributions were made by the Republican party in comparison to the Democratic party. 
+
+Final thoughts: From our data we can determine that the contributions made by each party fluctuates based on current events and changes year by year. We hope that our graphics and function can be used in the future to further analyze the flow of contributions in politics based on the current president. 
+
+## Footnotes:
+
+GitHub repository: https://github.com/esterzhao/sds192-mp2.git
