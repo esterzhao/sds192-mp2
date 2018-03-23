@@ -1,11 +1,13 @@
 ---
-title: "Mini-Project 2"
+title: "Behind the Scenes of Obama's Presidency"
 author: "Ester Zhao, Lizette Carpenter, and Emily Kim"
 date: "March 23, 2017"
 output: 
   html_document:
     code_folding: hide
 ---
+
+We wanted to look at how parties total contributions changed over Obama’s presidency (2008 to 2016) to observe how a Democratic president affects the contributions made to both the Republican and Democratic parties from committees. Because Obama’s presidency was marked by an inability to pass bills due to a standstill in the Senate and House, we wanted to look into the House and Senate elections that occurred during Obama’s presidency. We hypothesized that the Republican party made a large amount of contributions in order to make a primarily Republican Senate in order to prevent the Democratic president from passing bills. To do this, we used the data sets ‘candidates’ and ‘contributions’ provided by the Federal Election Commission. 
 
 ```{r setup, include = FALSE}
 library(tidyverse)
@@ -39,12 +41,15 @@ total_cand_contrib <- cand_contributions %>%
   group_by(cand_id) %>%
   summarise(total = sum(transaction_amt), n = n()) 
 
+#use a join function to add the total contributions for each candidate to the candidate information
 join_tbl <- total_cand_contrib %>%
   left_join(cand_info, cand_contributions, by = NULL, copy = FALSE, suffix = c(".cand_info", ".cand_con")) %>%
   filter(!is.na(cand_election_yr), 
          cand_party_affiliation != "" ) %>%
   arrange(cand_election_yr)
 
+
+#Create a final table that contains the needed data: candidate party, total contributions, and election year
 final_tbl <- join_tbl %>%
   filter(cand_party_affiliation == "DEM" | cand_party_affiliation == "REP") %>%
   filter(cand_election_yr != 2009 & cand_election_yr != 2011) %>%
@@ -69,11 +74,14 @@ ggplot(final_tbl, aes(x = cand_election_yr,
   
 ```
 
+This graph shows that the contributions made by both parties had a dramatic spike during Obama’s 2012 reelection run. The contributions for the other years are so insignificant in comparison that they appear to be almost nothing -- from this we can assume that the urgency of House and Senate elections seems to go up when a president considered controversial by some parties is in office. 
+
 ```{r, message = FALSE}
+#Create a list of years we want to analyze in graphs
 l_years = c(2008, 2010, 2012, 2014, 2016)
 ```
 
-Total Contributions By Each Year
+### Contrasting Contributions Per Year in Obama's Presidency
 ```{r, message = FALSE}
 yearly_contrib <- function(year_arg) {
   cand_info <- candidates %>%
@@ -98,12 +106,14 @@ yearly_contrib <- function(year_arg) {
            cand_party_affiliation != "" ) %>%
     arrange(cand_election_yr)
   
+  #final table that contains all needed information: party, office, total contributions, and election year
   final_tbl <- join_tbl %>%
     filter(cand_party_affiliation == "DEM" | cand_party_affiliation == "REP") %>%
     filter( cand_election_yr == year_arg) %>%
     group_by(cand_election_yr, cand_party_affiliation, cand_office) %>%
     summarise(total_contrib = sum(total), n = n())
   
+  #create the plot for a single year
   ggplot(final_tbl, aes(x = cand_party_affiliation, 
                         y = total_contrib)) +
     geom_bar(stat = "identity", 
@@ -115,6 +125,17 @@ yearly_contrib <- function(year_arg) {
     labs( x = "Party Affiliation",
           y = "Total Contributions ($)") 
 }
+
+#Use lapply to loop through the list of Obama's presidency years
 plots <- lapply(l_years, FUN = yearly_contrib)
 do.call("grid.arrange", c(plots, ncol = 2))
 ```
+
+To make this collection of graphs, we created a function that will take a year argument, and create a graph that compares the contributions made by the Democratic party and the Republican party to House and Senate elections. This function can be used for any year, but in this case we entered the years of Obama’s presidency. To do this, we used the lapply() function to create a for-loop over a list of Obama’s presidency years.
+
+These graphs show the total contributions made by the Republican and Democratic parties per year, for both Senate and House elections. This is to give a more detailed look into each year that is shown in the first graph above. These graphs show that a generalization about which party gave more contributions cannot be made, as this fluctuated greatly year by year. For the years 2014 and 2016, there was a lack of information within our datasets for Senate and House election contributions, hence the lack of data. 
+
+
+### Conclusion: 
+
+Our findings do not support our hypothesis that the Republican party made a large amount of contributions in order to make a primarily Republican Senate and House to undermine any efforts made by a Democratic president. Instead, our graphs show that the contributions made to either parties fluctuated greatly by year. The year after Obama was sworn into office show significantly more contributions made to the House elections by the Republican party. During Obama’s reelection year, the graphs show an even distributions of contributions made to both parties, showing an equal interest and investment in putting candidates of each party in office. Finally, in 2016, while Secretary Hillary Clinton and Donald Trump were running against year other for the presidential election, a large amount of contributions were made by the Republican party in comparison to the Democratic party. From our data we can determine that the contributions made by each party fluctuates based on current events and changes year by year. We hope that our graphics and function can be used in the future to further analyze the flow of contributions in politics based on the current president. 
