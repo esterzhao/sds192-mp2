@@ -1,7 +1,7 @@
 ---
 title: "Mini-Project 2"
 author: "Ester Zhao, Lizette Carpenter, and Emily Kim"
-date: "October 31, 2017"
+date: "March 23, 2017"
 output: 
   html_document:
     code_folding: hide
@@ -56,6 +56,9 @@ final_tbl <- join_tbl %>%
 ```{r}
 ggplot(final_tbl, aes(x = cand_election_yr, 
                       y = total_contrib)) +
+  labs( x = "Election Year",
+        y = "Total Contribution ($)") +
+  ggtitle("Insert Title") +
   geom_line() +
   geom_point(aes(color = cand_party_affiliation)) 
   
@@ -103,8 +106,8 @@ yearly_contrib <- function(year_arg) {
     scale_fill_manual(name = "Candidate Office", 
                         labels = c("House", "Senate"),
                         values = c("#66CC99", "#9999CC")) + 
-    labs( x = "Candidate Party Affiliation",
-          y = "Total Contributions ($)")
+    labs( x = "Party Affiliation",
+          y = "Total Contributions ($)") 
 }
 plots <- lapply(l_years, FUN = yearly_contrib)
 do.call("grid.arrange", c(plots, ncol = 2))
