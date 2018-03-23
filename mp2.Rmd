@@ -2,27 +2,19 @@
 title: "Mini-Project 2"
 author: "Ester Zhao, Lizette Carpenter, and Emily Kim"
 date: "October 31, 2017"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
-```{r}
+```{r setup, include = FALSE}
 library(tidyverse)
 library(dplyr)
 library(gridExtra)
 
 ```
 
-Instructions:
-1. discuss an interesting and well-motivated topic
-2. involve some non-trivial data wrangling (e.g. not just a bunch of mutate()s)
-3. provide a well thought-out, informative analysis
-4. convey some sort of insight
-5. be well-written
-
-
-## Loading the data
-
-```{r, include=FALSE}
+```{r, include = FALSE}
 load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
@@ -107,29 +99,13 @@ yearly_contrib <- function(year_arg) {
                         y = total_contrib)) +
     geom_bar(stat = "identity", 
              aes(fill = cand_office)) +
-    ggtitle(year_arg)
+    ggtitle(year_arg) + 
+    scale_fill_manual(name = "Candidate Office", 
+                        labels = c("House", "Senate"),
+                        values = c("#66CC99", "#9999CC")) + 
+    labs( x = "Candidate Party Affiliation",
+          y = "Total Contributions ($)")
 }
 plots <- lapply(l_years, FUN = yearly_contrib)
 do.call("grid.arrange", c(plots, ncol = 2))
 ```
-
-
-
-
-Plans:
-    1. Average total contributions by political party (presidential election)
-        - bar graph (area for contribution)
-    2. Contribution amount and election results (scatterplot/line graph)
-
-Steps:
-    1. Find a way to eliminate NA data from dataset DONE
-    2. Create a new data set that contains total contributions for each candidate
-        - Create a list of all cand_id DONE
-        - Create a function that runs through the list of names & checks in cand_contributions to consolidate cand total contributions
-    3. Merge total_contributions with cand_info using a join() function
-    4. Create a cool data graphic!!
-    5. Get an A!!!
-
-EDIT NEW PLAN: 
-  1. Use scatterplot to map DEM vs REP to show total contributions during Obama's Presidency 
-  2. Joining contributions for candidates (D vs R)
